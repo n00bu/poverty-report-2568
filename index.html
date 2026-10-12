@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#141e32">
+  <title>ก้าวพ้นเส้น · A Journey for Everyone</title>
+  <link rel="stylesheet" href="css/retro.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="game-layout" id="game-layout">
+    <header>
+      <a class="brand" href="#game"><span class="brand-icon" aria-hidden="true">✦</span><span>ก้าวพ้นเส้น<small>A JOURNEY FOR EVERYONE</small></span></a>
+      <div class="tools"><button id="music" aria-pressed="false" title="เปิดหรือปิดเพลงพิกเซลต้นฉบับแบบวนซ้ำ เพลงหยุดเมื่อซ่อนแท็บ แยกจากเสียงเอฟเฟกต์">เพลง: ปิด</button><button id="effects" aria-pressed="false" title="เปิดหรือปิดเสียงเอฟเฟกต์ แยกจากเพลงประกอบ">เอฟเฟกต์: ปิด</button><button id="journal-toggle" aria-expanded="false">สมุดเดินทาง [J]</button><button id="fullscreen">เต็มจอ</button><button id="pause">พัก [Esc]</button></div>
+    </header>
+      <div class="topbar">
+        <div><small id="zone-number">CHAPTER 01 / 04</small><strong id="zone-name">นาข้าวและความผันผวน</strong></div>
+        <div class="hud"><span>฿ <b id="balance">3,044</b><small>เงิน</small></span><span class="quality"><b id="quality-text">70 / 100</b><small>คุณภาพชีวิต</small><span class="meter" id="quality-meter" role="progressbar" aria-label="คุณภาพชีวิต" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"><i id="quality-fill"></i></span></span><span><b id="progress-text">0 / 4</b><small>ภารกิจสำเร็จ</small></span></div>
+      </div>
+      <div class="game-frame">
+        <canvas id="game" width="960" height="540" tabindex="0" aria-label="เกมผจญภัย ใช้ลูกศรหรือ A D เพื่อเดิน Space กระโดด E คุยหรือส่งภารกิจ J เปิดสมุด Esc พักเกม"></canvas>
+        <div class="mission-hud"><span id="mission-name">การเดินทางกำลังเริ่มต้น</span><small id="mission-progress">คุยกับชาวบ้าน เก็บทรัพยากร และช่วยชุมชน</small></div>
+        <div class="interaction" id="interaction" hidden><button id="interact">[E] คุย</button></div>
+        <div class="scene-message" id="toast" role="status" aria-live="polite"></div>
+        <section class="title-screen" id="title-screen" aria-labelledby="title-heading">
+          <h1 id="title-heading">ก้าวพ้นเส้น</h1>
+          <p class="title-sub">ทุกคนมีเส้นทาง<br>แต่โอกาสไม่ได้เท่ากัน</p>
+          <p>ออกสำรวจ 4 ชุมชน กระโดดข้ามอุปสรรค<br>รับภารกิจ และส่งต่อความช่วยเหลือ</p>
+          <div class="menu-actions"><button class="primary" id="new-game">เริ่มการเดินทาง →</button><button id="resume" hidden>เดินทางต่อจากจุดเซฟ</button></div>
+          <small>← → / A D เดิน · Space กระโดด · E คุย · J สมุดเดินทาง · ใช้ตำแหน่งปุ่มได้ทั้งแป้นไทยและอังกฤษ</small>
+          <p class="save-note" id="save-status" role="status"></p>
+        </section>
+        <section class="pause-screen" id="pause-screen" hidden aria-label="เกมหยุดชั่วคราว">
+          <h2>แวะพักริมทาง</h2><p>กลับมาเมื่อพร้อม การเดินทางยังรออยู่</p>
+          <button class="primary" id="unpause">เดินต่อ →</button><button id="return-title">หน้าหลัก</button>
+        </section>
+      <div class="quest-strip"><span id="quest-stage">✦ สำรวจโลก</span><span id="save-indicator">จุดเซฟ: แคมป์ท้ายแต่ละด่าน</span><div class="scene-tools"><button id="scene-journal" aria-expanded="false">สมุด</button><button id="scene-pause">พัก</button><button id="exit-fullscreen" hidden>ออกเต็มจอ</button></div></div>
+      <section class="conversation" id="conversation" hidden aria-labelledby="npc-name">
+        <div class="portrait" id="portrait" aria-hidden="true"><canvas id="npc-portrait" width="36" height="40"></canvas></div><div class="conversation-copy"><small id="npc-role"></small><h2 id="npc-name"></h2><small>กด E อีกครั้ง / Esc หรือปุ่ม × เพื่อปิดข้อความ</small><div id="npc-body"></div></div><button id="close-conversation" aria-label="ปิดบทสนทนา">×</button>
+      </section>
+      <div class="controls">
+        <div class="touch"><button data-control="left" aria-label="เดินซ้าย">←</button><button data-control="right" aria-label="เดินขวา">→</button></div>
+        <span class="keyboard-help">เดิน ← → · กระโดด Space · คุย / ส่งของ E<br>ป้ายอยู่ในโลก · แคมป์คือจุดเซฟ</span>
+        <div class="touch"><button id="touch-interact" aria-label="คุย ส่งภารกิจ หรือบันทึก">E คุย</button><button class="jump" data-control="jump" aria-label="กระโดด">↑ กระโดด</button></div>
+      </div>
+      <section class="inventory" aria-label="นโยบายที่เก็บได้"><span>กระเป๋านโยบาย</span><div id="policies">ยังไม่มีนโยบาย</div></section>
+    <section class="journal" id="journal" hidden aria-labelledby="journal-title" tabindex="-1">
+      <div class="section-heading"><div><p class="eyebrow">FIELD NOTES / 2568</p><h2 id="journal-title">สมุดเดินทาง</h2></div><button id="close-journal">ปิดสมุด</button></div>
+      <p>บันทึกข้อมูลจากชุมชนที่คุณแวะคุย เปิดอ่านซ้ำได้โดยไม่หยุดเกม</p><div id="journal-pages"></div>
+    </section>
+    <section class="ending" id="ending" hidden aria-labelledby="ending-title" tabindex="-1">
+      <p class="eyebrow">FOUR COMMUNITIES. ONE SHARED FUTURE.</p><h2 id="ending-title">ไม่มีใครควรเดินอยู่คนเดียว</h2><p id="ending-result"></p>
+      <div class="summary-grid" id="summary-cards"></div>
+      <h3>สิ่งที่เราพกกลับจากการเดินทาง</h3><ul><li>จัดการน้ำและภัยพิบัติ เพื่อเพิ่มความยืดหยุ่นให้ภาคเกษตร</li><li>แบ่งเบาภาระครอบครัวด้วยการสนับสนุนเด็กและผู้สูงอายุ</li><li>ลดค่าเดินทางและค่าใช้จ่ายแฝง เพื่อเปิดโอกาสการศึกษา</li><li>เพิ่มการเข้าถึงสุขภาพ น้ำประปา อินเทอร์เน็ต และสินเชื่อในระบบอย่างรับผิดชอบ</li></ul>
+      <p>สถิติใช้ตามข้อกำหนดผู้จัดทำ ยังไม่ได้ตรวจสอบต้นฉบับ สศช. เงินและผลนโยบายในเกมเป็นกลไกเพื่อการเรียนรู้ ไม่ใช่ผลประเมินจริง คะแนนคุณภาพชีวิตไม่ใช่ MPI ข้อเสนอข้างต้นเป็นบทสรุปเพื่อการเรียนรู้</p>
+      <button class="primary" id="play-again">เริ่มเรื่องราวใหม่</button>
+    </section>
+    </div>
+    </section>
+    <details class="guide"><summary>วิธีเล่น · ข้อมูลและเครดิต</summary><p>คุยกับ NPC ด้วย E เพื่อรับภารกิจ กระโดดขึ้นทางไม้เก็บของ 3 ชิ้น และเก็บนโยบาย 2 อย่างของแต่ละด่าน นำไปส่งที่แคมป์เพื่อเปิดทางไปชุมชนถัดไป คุยซ้ำเพื่ออ่านข้อมูลได้ กดกระโดดค้างเพื่อขึ้นสูง แตะสั้นเพื่อกระโดดเตี้ย และกดเดินกับกระโดดพร้อมกันได้บนจอสัมผัส</p><p>แคมป์บันทึกอัตโนมัติเมื่อส่งภารกิจ กด E ที่แคมป์เพื่อบันทึกอีกครั้ง ข้อมูลเก็บในเบราว์เซอร์เครื่องนี้ ไม่ส่งไปเซิร์ฟเวอร์ ความคืบหน้าหลังจุดเซฟยังไม่ถูกบันทึก เมื่อคุณภาพชีวิตหมดจะกลับแคมป์โดยเก็บของที่พบไว้ เงินหมดไม่ทำให้จบเกม</p><p>ภาพและตัวละครพิกเซลวาดขึ้นใหม่ด้วย Canvas แล้วเก็บฉาก แสง และสไปรต์เป็นภาพแคชในหน่วยความจำ ไม่ต้องดาวน์โหลด asset ภายนอก ฟิสิกส์ทำงานที่ 60 ขั้นต่อวินาทีและแทรกตำแหน่งระหว่างเฟรมเพื่อให้การเคลื่อนไหวต่อเนื่อง ไม่มีทรัพย์สินจากเกมอื่น สถิติใช้ตามข้อกำหนดผู้จัดทำที่อ้างชื่อรายงาน สศช. ปี 2568 ยังไม่ได้ตรวจสอบเอกสารต้นฉบับ ค่า Gini ไม่ได้ระบุ</p><p>เงิน รางวัล ผลนโยบาย และภารกิจเป็นเรื่องสมมติเพื่อการเรียนรู้ คะแนนคุณภาพชีวิตไม่ใช่ค่า MPI ข้อเสนอท้ายเกมไม่ใช่ข้อความอ้างโดยตรงจากรายงาน</p></details>
+  </main>
+  <script defer src="js/config.js"></script>
+  <script defer src="js/audio.js"></script>
+  <script defer src="js/player.js"></script>
+  <script defer src="js/levels.js"></script>
+  <script defer src="js/main.js"></script>
+</body>
+</html>
