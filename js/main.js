@@ -14,7 +14,7 @@ const renderingGuide=document.createElement("p");
 renderingGuide.textContent="ระบบภาพเก็บแคชฉากหลังเฉพาะพื้นที่เหนือพื้นดิน รวมภาพและป้ายอุปสรรคไว้ในแคชพื้นฉาก เหลือเฉพาะเอฟเฟกต์เคลื่อนไหวที่วาดทุกเฟรม เพดานแคชปรับตามความกว้างพื้นที่เล่นเพื่อไม่ให้ภาพที่ยังอยู่บนจอถูกลบและสร้างซ้ำ และเตรียมส่วนถัดไปช่วงเบราว์เซอร์ว่างเมื่อมีพื้นที่แคชเหลือ สไปรต์ใช้คีย์ที่เตรียมไว้แทนการแปลงข้อมูลทุกเฟรม";
 document.querySelector(".guide").append(renderingGuide);
 const transitionGuide=document.createElement("p");
-transitionGuide.textContent="เมื่อข้ามด่าน ฉากหลังค่อย ๆ เปลี่ยนภายใน 0.65 วินาทีโดยไม่หยุดการเดิน หากตั้งค่าลดการเคลื่อนไหวในอุปกรณ์ จะเปลี่ยนฉากทันที";
+transitionGuide.textContent="เมื่อข้ามด่าน ฉากหลังค่อย ๆ เปลี่ยนภายใน 0.65 วินาทีโดยไม่หยุดการเดิน ใช้ภาพฉากหลังจากเฟรมก่อนและบัฟเฟอร์ภาพที่ใช้ซ้ำได้ ไม่วาดฉากเดิมขึ้นใหม่ตอนข้ามด่าน หากตั้งค่าลดการเคลื่อนไหวในอุปกรณ์ จะเปลี่ยนฉากทันที";
 document.querySelector(".guide").append(transitionGuide);
 const reducedMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const keys=new Set(),pointers=new Map();
@@ -25,6 +25,8 @@ const beep=(frequency,duration)=>gameAudio.beep(frequency,duration);
 let camera=0,viewW=W,time=0,last=0,hudTime=0,toastTimer=0,nearby=null,conversationZone=-1;
 let mode="title",hasSession=false,loadedSave=null;
 let backgroundZone=null,backgroundTransition=null;
+const backgroundSurfaces=[document.createElement("canvas"),document.createElement("canvas")];
+let backgroundSurfaceIndex=0;
 let state;
 let hudSignature="",bagSignature=null,interactionLabel="";
 let accumulator=0,previousPose=null,lastRenderedMode="";
@@ -345,7 +347,7 @@ let cachedPixels=0;
 function cachePixelLimit(){
   // Keep the visible five-layer working set resident, including chunk overlap and small sprites.
   return Math.max(CACHE_PIXEL_LIMIT,
-    (backgroundTransition?7:5)*(Math.ceil(viewW/CHUNK_WIDTH)+1)*CHUNK_WIDTH*H+viewW*H+2000000);
+    5*(Math.ceil(viewW/CHUNK_WIDTH)+1)*CHUNK_WIDTH*H+viewW*H+2000000);
 }
 const pendingChunks=new Map();
 let warmingScheduled=false;
@@ -516,7 +518,7 @@ function background(zone){
     pixelOval(sunX-4,81,12,12,"#fff8d8",2);
   });
   ctx.drawImage(sky,0,0);
-  cachedChunks(`clouds:${zone}`,camera*(reducedMotion?0:.07),(start,width)=>{
+  cachedChunks("clouds",camera*(reducedMotion?0:.07),(start,width)=>{
     for(let i=Math.floor(start/260)-1;i<(start+width)/260+1;i++){
       const x=i*260-start+noise(i)*60,y=75+noise(i+31)*85;
       for(let j=0;j<5;j++){
@@ -863,18 +865,26 @@ function drawGate(zone){
 }
 function draw(){
   ctx.imageSmoothingEnabled=false;const zone=currentZone();
-  if(backgroundZone!==null&&zone!==backgroundZone&&!reducedMotion){
-    const image=document.createElement("canvas");image.width=viewW;image.height=GROUND;
-    backgroundTransition={image,start:time};
+  if(reducedMotion)background(zone);
+  else{
+    if(backgroundSurfaces.some(image=>image.width!==viewW||image.height!==GROUND)){
+      for(const image of backgroundSurfaces){image.width=viewW;image.height=GROUND;}
+      backgroundZone=null;backgroundTransition=null;
+    }
+    if(backgroundZone!==null&&zone!==backgroundZone){
+      backgroundTransition={image:backgroundSurfaces[backgroundSurfaceIndex],start:time};
+      backgroundSurfaceIndex=1-backgroundSurfaceIndex;
+    }
+    const image=backgroundSurfaces[backgroundSurfaceIndex];
     const liveContext=ctx;
     ctx=image.getContext("2d");ctx.imageSmoothingEnabled=false;
-    try{background(backgroundZone);}finally{ctx=liveContext;}
+    try{background(zone);}finally{ctx=liveContext;}
+    ctx.drawImage(image,0,0);
   }
   backgroundZone=zone;
-  background(zone);
   if(backgroundTransition){
     const progress=Math.min(1,Math.max(0,(time-backgroundTransition.start)/.65));
-    if(progress>=1){backgroundTransition=null;trimImageCache();}
+    if(progress>=1)backgroundTransition=null;
     else{
       ctx.save();ctx.globalAlpha=1-progress*progress*(3-2*progress);
       ctx.drawImage(backgroundTransition.image,0,0);ctx.restore();
